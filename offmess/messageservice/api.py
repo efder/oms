@@ -6,6 +6,9 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from .models import Message, Block
 from .serializers import MessageSerializer, BlockSerializer
 from .permissions import IsSenderOrReceiver
+import logging
+
+logger = logging.getLogger('django')
 
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
@@ -32,9 +35,11 @@ class MessageViewSet(viewsets.ModelViewSet):
         blocked = Block.objects.filter(blocking_user=receiver, blocked_user=self.request.user).exists()
         # The sender is blocked, do not send the message
         if blocked:
-            raise PermissionDenied(detail={"detail":  "You are blocked by " + self.request.data['receiver']} + ".")
+            logger.info("Blocked Message: Message from %s to %s is blocked", self.request.user.username, receiver_param)
+            raise PermissionDenied(detail={"detail":  "You are blocked by " + self.request.data['receiver']})
         else:
             serializer.save(sender=self.request.user, receiver=receiver)
+            logger.info("Successful Message: Message from %s to %s is sent", self.request.user.username, receiver_param)
 
 # View for listing and querying messages sent by current authenticated user
 class SentMessageListView(generics.ListAPIView):
@@ -96,4 +101,8 @@ class BlockUserViewSet(viewsets.ModelViewSet):
         blocked_user = User.objects.filter(username=blocked_param).first()
         if blocked_user is None:
             raise ValidationError(detail={"detail":"User to be blocked does not exist."}, code=400)
+        # Check that if the user is already blocked
+        if Block.objects.filter(blocking_user=self.request.user, blocked_user=blocked_user).exists():
+            raise ValidationError(detail={"detail": "User %s has already been blocked." % blocked_param } , code=400)
         serializer.save(blocking_user=self.request.user, blocked_user=blocked_user)
+        logger.info("Block User: %s blocked %s", self.request.user.username, blocked_param)

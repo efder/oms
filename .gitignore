@@ -117,3 +117,6 @@ dmypy.json
 
 # VS code stuff
 .vscode
+
+# Virtual environment stuff
+./dev
