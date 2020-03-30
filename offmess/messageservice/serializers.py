@@ -4,7 +4,7 @@ from .models import Message, Block
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = ('id', 'sender', 'receiver', 'content', 'date', )
+        fields = ('sender', 'receiver', 'content', 'date', )
     # Serialize only the users' usernames
     sender = serializers.ReadOnlyField(source='sender.username')
     receiver = serializers.ReadOnlyField(source='receiver.username')
@@ -12,7 +12,7 @@ class MessageSerializer(serializers.ModelSerializer):
 class BlockSerializer(serializers.ModelSerializer):
     class Meta:
         model = Block
-        fields = ('id', 'blocking_user', 'blocked_user', )
+        fields = ('blocking_user', 'blocked_user', )
     
     # Serialize only the usernames
     blocking_user = serializers.ReadOnlyField(source='blocking_user.username')

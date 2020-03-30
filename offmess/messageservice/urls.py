@@ -4,7 +4,7 @@ from rest_framework import routers
 from rest_framework.urls import url
 from .api import MessageViewSet, SentMessageListView, ReceivedMessageListView, BlockUserViewSet
 
-router = routers.DefaultRouter()
+router = routers.SimpleRouter(trailing_slash=False)
 router.register(r'api/message', MessageViewSet)
 router.register(r'api/block', BlockUserViewSet)
 
