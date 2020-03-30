@@ -1,10 +1,13 @@
-from django.contrib.auth.models import User
-from rest_framework import generics, permissions
-from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError
-from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
 import logging
+
+from django.contrib.auth.models import User
+from knox.models import AuthToken
+from rest_framework import generics, permissions
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+from rest_framework import status
+
+from .serializers import LoginSerializer, RegisterSerializer, UserSerializer
 
 logger = logging.getLogger('django')
 
@@ -19,8 +22,7 @@ class RegisterAPI(generics.GenericAPIView):
         return Response({
             "user": UserSerializer(user, context=self.get_serializer_context()).data,
             "token": AuthToken.objects.create(user)[1]
-        })
-
+        }, status=status.HTTP_201_CREATED)
 
 # Login API
 class LoginAPI(generics.GenericAPIView):
