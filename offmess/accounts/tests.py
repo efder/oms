@@ -56,6 +56,3 @@ class LoginTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT) 
         response = self.client.get("/api/message")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-    
-
-        
