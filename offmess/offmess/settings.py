@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '%tb+wwm^2=&i1_d0cy(45_e6&@0x&0rmd9yqa7unin)k%om=d&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', ]
 
 
 # Application definition
@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'knox',
     'accounts',
     'messageservice',
+    'exceptions',
+
 ]
 
 REST_FRAMEWORK = {
@@ -125,4 +127,4 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = '/static/'
+# STATIC_URL = '/static/'

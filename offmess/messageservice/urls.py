@@ -6,7 +6,7 @@ from .api import MessageViewSet, SentMessageListView, ReceivedMessageListView, B
 
 router = routers.DefaultRouter()
 router.register(r'api/message', MessageViewSet)
-router.register(r'block', BlockUserViewSet)
+router.register(r'api/block', BlockUserViewSet)
 
 urlpatterns = [
     url(r'api/message/sent', SentMessageListView.as_view()),

@@ -1,6 +1,8 @@
 from rest_framework import viewsets, permissions, generics, mixins
+from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.db.models import Q
+from rest_framework.exceptions import PermissionDenied
 from .models import Message, Block
 from .serializers import MessageSerializer, BlockSerializer
 from .permissions import IsSenderOrReceiver
@@ -13,18 +15,20 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = self.queryset
-        user = User.objects.get(username=self.request.user.username)
-        return queryset.filter(Q(sender=user) | Q(receiver=user))
-
+        #user = User.objects.get(username=self.request.user.username).first()
+        # If the user exists then return the results
+        # if user is not None:
+        #     return queryset.filter(Q(sender=user) | Q(receiver=user))
+        raise PermissionDenied("Heyy")
+        
     def perform_create(self, serializer):
         receiver = User.objects.get(username=self.request.data['receiver'])
         # Check that if the sender is the blocked by receiver
-        num_results = Block.objects.get(blocking_user=receiver, blocked_user=self.request.user)
+        num_results = Block.objects.filter(blocking_user=receiver, blocked_user=self.request.user).count()
+        # The sender is blocked, do not send the message
         if num_results > 0:
-            print("Heyy")
-            return -1
+            raise PermissionDenied("You are blocked by " + self.request.data['receiver'])
         else:
-            print("OK")
             serializer.save(sender=self.request.user, receiver=receiver)
 
 class SentMessageListView(generics.ListAPIView):
