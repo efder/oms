@@ -4,7 +4,7 @@ from .models import Message, Block
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = ('sender', 'receiver', 'content', 'date', )
+        fields = ('sender', 'receiver', 'content', 'created', )
     # Serialize only the users' usernames
     sender = serializers.ReadOnlyField(source='sender.username')
     receiver = serializers.ReadOnlyField(source='receiver.username')

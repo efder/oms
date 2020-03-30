@@ -1,12 +1,13 @@
 from rest_framework import viewsets, permissions, generics, mixins
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from django.db.models import Q
+from django.db.models import Q, DateField
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from .models import Message, Block
 from .serializers import MessageSerializer, BlockSerializer
 from .permissions import IsSenderOrReceiver
 import logging
+import datetime
 
 logger = logging.getLogger('django')
 
@@ -50,6 +51,8 @@ class SentMessageListView(generics.ListAPIView):
     def get_queryset(self):
         queryset = self.queryset
         user = User.objects.get(username=self.request.user.username)
+        
+        # Check if receiver_param has been given, if given filter by it
         receiver_param = self.request.query_params.get('receiver', None)
         if receiver_param is not None:
             receiver = User.objects.filter(username=receiver_param).first()
@@ -59,6 +62,18 @@ class SentMessageListView(generics.ListAPIView):
                 raise ValidationError(detail={"detail": "Receiver does not exist."}, code=400)
         else:
             queryset = queryset.filter(Q(sender=user))
+        
+        # Check if date_param has been given, if given filter by it
+        # Date format: YYYY-MM-DD
+        date_param = self.request.query_params.get('date', None)
+        if date_param is not None:
+            try:
+                # Check that if the date is in correct format
+                year, month, day = date_param.split('-')
+                datetime.datetime(int(year), int(month), int(day))
+                queryset = queryset.filter(created__date=date_param)
+            except:
+                raise ValidationError(detail={"detail": "url date parameter must be in YYYY-MM-DD format"}, code=400)
         return queryset
     
 # View for listing and querying messages sent to current authenticated user
@@ -70,6 +85,7 @@ class ReceivedMessageListView(generics.ListAPIView):
     def get_queryset(self):
         queryset = self.queryset
         user = User.objects.get(username=self.request.user.username)
+        # Check if sender_param has been given, if given filter by it
         sender_param = self.request.query_params.get('sender', None)
         if sender_param is not None:
             sender = User.objects.filter(username=sender_param).first()
@@ -79,6 +95,18 @@ class ReceivedMessageListView(generics.ListAPIView):
                 raise ValidationError(detail={"detail": "Sender does not exist."}, code=400)
         else:
             queryset = queryset.filter(Q(receiver=user))
+        
+        # Check if date_param has been given, if given filter by it
+        # Date format: YYYY-MM-DD
+        date_param = self.request.query_params.get('date', None)
+        if date_param is not None:
+            try:
+                # Check that if the date is in correct format
+                year, month, day = date_param.split('-')
+                datetime.datetime(int(year), int(month), int(day))
+                queryset = queryset.filter(created__date = date_param)
+            except:
+                raise ValidationError(detail={"detail": "url date parameter must be in YYYY-MM-DD format"})
         return queryset 
 
 # View for blocking the users and listing blocked users of current authenticated user

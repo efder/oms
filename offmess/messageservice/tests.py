@@ -51,7 +51,15 @@ class SentMessageTestCase(APITestCase):
     def test_list_sent_messages_by_not_existing_receiver(self):
         response = self.client.get("/api/message/sent?receiver=rcvr")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
+    
+    def test_list_sent_messages_by_date_ok(self):
+        response = self.client.get("/api/message/sent?date=2020-03-30")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    def test_list_sent_messages_by_date_not_ok(self):
+        response = self.client.get("/api/message/sent?date=2020-1-0")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
 class ReceivedMessageListTestCase(APITestCase):
     def setUp(self):
         self.sender = User.objects.create_user(username="sender", password="sender_pw")
@@ -68,6 +76,14 @@ class ReceivedMessageListTestCase(APITestCase):
     
     def test_list_received_messages_by_not_existing_sender(self):
         response = self.client.get("/api/message/received?sender=sndr")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_list_received_messages_by_date_ok(self):
+        response = self.client.get("/api/message/received?date=2020-03-30")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    def test_list_received_messages_by_date_not_ok(self):
+        response = self.client.get("/api/message/received?date=2020-1-0")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 class BlockUserTestCase(APITestCase):

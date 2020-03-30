@@ -10,7 +10,7 @@ class Message(models.Model):
         'auth.User', on_delete=models.SET_NULL, related_name='receiver_user', null=True
     )
     # Date when the message sent
-    date = models.DateTimeField(
+    created = models.DateTimeField(
         auto_now_add=True
     )
     # Content of the message
