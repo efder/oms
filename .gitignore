@@ -119,4 +119,4 @@ dmypy.json
 .vscode
 
 # Virtual environment stuff
-./dev
+dev/
